@@ -2,9 +2,9 @@
   <div>
     <img :src="user.photoURL" id="photo">
     <h1 class="userName">{{dbState.name || user.displayName}}</h1>
-    <button @click="logOut" style="padding: 3px 4px 3px 4px;">Kijelentkezés</button><br>
+    <button @click="logOut" style="padding: 3px 5px 3px 4px;">{{ $t('logout') }}</button><br>
     <br><br>
-    <input type="button" @click="$modal.show('add')" class="add_btn" value="Új elem hozzáadása" />
+    <input type="button" @click="$modal.show('add')" class="add_btn" :value="$t('add_new')" />
     <br><br>
     <tbl :data="gridData"
          :columns="gridColumns"
@@ -13,34 +13,34 @@
          hiddenClass="editor">
       <template slot-scope="{ item }">
         <div class="hidden_container">
-          <span @click="more(item.id)" class="more" title="Több">&rtrif;</span>
-          <span @click="del(item.id)" class="del" title="Törlés">&cross;</span>
-          <span @click="req(item.id)" class="req" title="Kérés" v-if="!item.requested">&plus;</span>
+          <span @click="more(item.id)" class="more" :title="$t('more')">&rtrif;</span>
+          <span @click="del(item.id)" class="del" :title="$t('delete')">&cross;</span>
+          <span @click="req(item.id)" class="req" :title="$t('request')" v-if="!item.requested">&plus;</span>
         </div>
       </template>
     </tbl>
     <modal name="add"
            :classes="['v--modal']"
-           width="240px"
+           width="260px"
            height="auto"
            :pivotY="0.3"
            @opened="pop">
       <div class="add-dialog">
         <form @submit="add">
-          <label for="itemName">Név: &nbsp;</label>
+          <label for="itemName">{{ $t('name') }}: &nbsp;</label>
           <input type="text" id="itemName"
                  minlength="2" size="20" required />
           <br><br>
-          <label for="price">Ár: &nbsp;</label>
+          <label for="price">{{ $t('price_title') }}: &nbsp;</label>
           <input type="text" id="price"
                  pattern="[0-9]+"
                  minlength="2" size="20" required />
           <br><br>
-          <label for="shop">Bolt: &nbsp;</label>
+          <label for="shop">{{ $t('shop_title') }}: &nbsp;</label>
           <input type="text" id="shop" size="20" />
           <br><hr>
-          <input type="submit" class="btn" value="Hozzáad" />
-          <input type="button" @click="$modal.hide('add')" class="btn" value="Mégse" />
+          <input type="submit" class="btn" :value="$t('add')" />
+          <input type="button" @click="$modal.hide('add')" class="btn" :value="$t('cancel')" />
         </form>
       </div>
     </modal>
@@ -64,11 +64,11 @@ export default {
       userRef: {},
       dbState: {},
       gridColumns: [
-        {title: 'Legközelebb kell', field: 'next', sortable: true},
-        {title: 'Milyen gyakran kell', field: 'often', sortable: true},
-        {title: 'Tárgy', field: 'name', sortable: true},
-        {title: 'Bolt', field: 'shop', sortable: true},
-        {title: 'Ár', field: 'price', sortable: true}
+        {title: this.$t('next_title'), field: 'next', sortable: true},
+        {title: this.$t('often_title'), field: 'often', sortable: true},
+        {title: this.$t('name_title'), field: 'name', sortable: true},
+        {title: this.$t('shop_title'), field: 'shop', sortable: true},
+        {title: this.$t('price_title'), field: 'price', sortable: true}
       ],
       searchQuery: ''
     }
@@ -76,7 +76,7 @@ export default {
   computed: {
     gridData () {
       return (this.dbState.items) ? this.dbState.items.map((v, i) => {
-        return {next: 'most', often: 'nincs elég adat', name: v.name, shop: v.shop, price: v.price, requested: v.requested, id: i}
+        return {next: this.$t('now'), often: this.$t('insufficient_data'), name: v.name, shop: v.shop, price: v.price, requested: v.requested, id: i}
       }) : []
     }
   },

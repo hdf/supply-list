@@ -1,10 +1,10 @@
 <template>
   <div>
     <login></login>
-    <div class="title"><h1>Ellátmány lista</h1></div>
+    <div class="title"><h1>{{ $t('title') }}</h1></div>
     <div class="box">
-        <p>A felhasználó beírja, mire van szüksége, majd kilépéskor kap egy linket, amit megoszhat azzal aki beszerzi a cikket számára és kipipálja az elemet.</p>
-        <p>Különféle statisztikák is generálódnak a vásárlás információk alapján.</p>
+      <p>{{ $t('details1') }}</p>
+      <p>{{ $t('details2') }}</p>
     </div>
   </div>
 </template>
@@ -18,8 +18,7 @@ export default {
     login
   },
   data () {
-    return {
-    }
+    return { }
   }
 }
 </script>

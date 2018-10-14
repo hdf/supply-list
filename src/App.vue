@@ -10,8 +10,7 @@
 export default {
   name: 'App',
   data () {
-    return {
-    }
+    return { }
   }
 }
 </script>
@@ -30,5 +29,8 @@ html, body {
 body {
   background: linear-gradient(150deg,#281080 -5%,#8f6ed5 70%,#d782e0 94%);
   background-attachment: fixed;
+}
+.v--modal-box {
+  box-shadow: 4px 2px 4px rgba(0, 0, 0, .6), 0 20px 60px -2px rgba(27, 33, 58, 0.4);
 }
 </style>

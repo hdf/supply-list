@@ -11,7 +11,7 @@
          v-show="dbState.items"
          hiddenClass="viewer">
       <template slot-scope="{ item }">
-        <span @click="check(item.id)" title="Megvéve">&check;</span>
+        <span @click="check(item.id)" :title="$t('bought')">&check;</span>
       </template>
     </tbl>
     <modal name="bought"
@@ -22,13 +22,13 @@
            @opened="pop">
       <div class="amount-dialog">
         <form @submit="bought">
-          <label for="amount">Vett mennyiség: &nbsp;</label>
+          <label for="amount">{{ $t('bought_amount') }}: &nbsp;</label>
           <input type="text" id="amount"
                  pattern="[0-9]+"
                  maxlength="3" minlength="1" value="1" size="2" required />
           <br><br>
-          <input type="submit" class="btn" value="Megvéve!" />
-          <input type="button" @click="$modal.hide('bought')" class="btn" value="Mégse" />
+          <input type="submit" class="btn" :value="$t('bought') + '!'" />
+          <input type="button" @click="$modal.hide('bought')" class="btn" :value="$t('cancel')" />
         </form>
       </div>
     </modal>
@@ -50,11 +50,11 @@ export default {
       userRef: {},
       dbState: {},
       gridColumns: [
-        {title: 'Legközelebb kell', field: 'next', sortable: true},
-        {title: 'Milyen gyakran kell', field: 'often', sortable: true},
-        {title: 'Tárgy', field: 'name', sortable: true},
-        {title: 'Bolt', field: 'shop', sortable: true},
-        {title: 'Ár', field: 'price', sortable: true}
+        {title: this.$t('next_title'), field: 'next', sortable: true},
+        {title: this.$t('often_title'), field: 'often', sortable: true},
+        {title: this.$t('name_title'), field: 'name', sortable: true},
+        {title: this.$t('shop_title'), field: 'shop', sortable: true},
+        {title: this.$t('price_title'), field: 'price', sortable: true}
       ],
       searchQuery: ''
     }
@@ -62,7 +62,7 @@ export default {
   computed: {
     gridData () {
       return (this.dbState.items) ? this.dbState.items.filter((v) => v.requested).map((v, i) => {
-        return {next: 'most', often: 'nincs elég adat', name: v.name, shop: v.shop, price: v.price, id: i}
+        return {next: this.$t('now'), often: this.$t('insufficient_data'), name: v.name, shop: v.shop, price: v.price, id: i}
       }) : []
     }
   },

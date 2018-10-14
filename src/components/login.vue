@@ -7,8 +7,8 @@
 <script>
 import firebase from 'firebase/app'
 import 'firebase/auth'
-// import firebaseui from 'firebaseui'
-import firebaseui from 'firebaseui/dist/npm__hu'
+import firebaseui from 'firebaseui'
+// import firebaseui from 'firebaseui/dist/npm__hu'
 
 export default {
   name: 'login',
