@@ -18,6 +18,10 @@ import VueI18Next from '@panter/vue-i18next'
 Vue.use(VModal)
 Vue.use(VueI18Next)
 
+const moment = require('moment')
+require('moment/locale/hu')
+Vue.use(require('vue-moment'), { moment })
+
 const locales = {
   hu: {
     title: 'Ellátmány lista',
@@ -39,7 +43,8 @@ const locales = {
     delete: 'Törlés',
     request: 'Kérés',
     name: 'Név',
-    add: 'Hozzáad'
+    add: 'Hozzáad',
+    lastChanged: 'Utoljára változtatva'
   },
   en: {
     title: 'Supply list',
@@ -61,12 +66,13 @@ const locales = {
     delete: 'Delete',
     request: 'Request',
     name: 'Name',
-    add: 'Add'
+    add: 'Add',
+    lastChanged: 'Last changed'
   }
 }
 
 i18next.init({
-  lng: navigator.language,
+  lng: (navigator.language === 'hu') ? 'hu' : 'en',
   fallbackLng: 'en',
   resources: {
     en: { translation: locales.en },
@@ -127,6 +133,7 @@ new Vue({
   i18n: i18n,
   template: '<app/>',
   created () {
+    this.$moment.locale(i18n.i18next.language)
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$router.replace('/edit/')

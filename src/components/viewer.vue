@@ -3,6 +3,11 @@
     <login></login>
     <img v-show="dbState.img" :src="dbState.img" id="photo">
     <h1 v-show="dbState.name" class="userName">{{dbState.name}}</h1>
+    <p class="lastChanged" v-if="dbState.lastChange">{{ $t('lastChanged') }}:
+      <span :title="dbState.lastChange | moment('from', 'now')">
+        {{ dbState.lastChange | moment("YYYY.MM.DD. HH:mm:ss") }}
+      </span>
+    </p>
     <!-- <div class="box" v-show="dbState.items"><pre style="text-align: left;">{{dbState.items}}</pre></div><br> -->
     <br>
     <tbl :data="gridData"
@@ -76,6 +81,7 @@ export default {
         amount: document.getElementById('amount').value,
         date: Date.now()
       })
+      this.dbState.lastChange = Date.now()
       this.userRef.update(this.dbState)
       this.$modal.hide('bought')
     },

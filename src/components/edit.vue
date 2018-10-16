@@ -2,8 +2,13 @@
   <div>
     <img :src="user.photoURL" id="photo">
     <h1 class="userName">{{dbState.name || user.displayName}}</h1>
+    <p class="lastChanged" v-if="dbState.lastChange">{{ $t('lastChanged') }}:
+      <span :title="dbState.lastChange | moment('from', 'now')">
+        {{ dbState.lastChange | moment("YYYY.MM.DD. HH:mm:ss") }}
+      </span>
+    </p><br>
     <button @click="logOut" style="padding: 3px 5px 3px 4px;">{{ $t('logout') }}</button><br>
-    <br><br>
+    <br>
     <input type="button" @click="$modal.show('add')" class="add_btn" :value="$t('add_new')" />
     <br><br>
     <tbl :data="gridData"
@@ -97,7 +102,9 @@ export default {
           this.userRef.set({
             name: this.user.displayName,
             img: this.user.photoURL,
-            items: []
+            items: [],
+            created: Date.now(),
+            lastChange: Date.now()
           })
         }
       })
@@ -106,10 +113,12 @@ export default {
     },
     del (id) {
       this.dbState.items.splice(id, 1)
+      this.dbState.lastChange = Date.now()
       this.userRef.update(this.dbState)
     },
     req (id) {
       this.dbState.items[id].requested = true
+      this.dbState.lastChange = Date.now()
       this.userRef.update(this.dbState)
     },
     add () {
@@ -120,6 +129,7 @@ export default {
         requested: true,
         boughtTimes: []
       })
+      this.dbState.lastChange = Date.now()
       this.userRef.update(this.dbState)
       this.$modal.hide('add')
     },
