@@ -38,8 +38,12 @@ export default {
     this.columns.forEach(function (key) {
       sortOrders[key.field] = 1
     })
+    if (this.$route.query.sort && sortOrders[this.$route.query.sort] &&
+       (this.$route.query.direction === 1 || this.$route.query.direction === -1)) {
+      sortOrders[this.$route.query.sort] = this.$route.query.direction
+    }
     return {
-      sortKey: '',
+      sortKey: this.$route.query.sort || '',
       sortOrders: sortOrders
     }
   },
@@ -75,6 +79,7 @@ export default {
     sortBy: function (key) {
       this.sortKey = key
       this.sortOrders[key] = this.sortOrders[key] * -1
+      this.$router.replace({query: {sort: key, direction: this.sortOrders[key]}})
     }
   }
 }

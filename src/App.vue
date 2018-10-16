@@ -31,6 +31,6 @@ body {
   background-attachment: fixed;
 }
 .v--modal-box {
-  box-shadow: 4px 2px 4px rgba(0, 0, 0, .6), 0 20px 60px -2px rgba(27, 33, 58, 0.4);
+  box-shadow: 4px 2px 4px rgba(0, 0, 0, .6), 0 20px 60px -2px rgba(27, 33, 58, 0.4) !important;
 }
 </style>
