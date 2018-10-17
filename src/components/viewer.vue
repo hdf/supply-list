@@ -26,6 +26,7 @@
            :pivotY="0.4"
            @opened="pop">
       <div class="amount-dialog">
+        <p v-if="modalId">{{dbState.items[modalId].name}}</p>
         <form @submit="bought">
           <label for="amount">{{ $t('bought_amount') }}: &nbsp;</label>
           <input type="text" id="amount"
@@ -37,6 +38,10 @@
         </form>
       </div>
     </modal>
+    <br>
+    <div class="box" v-if="dbState.items">
+      {{ $t('total') }}: {{ sum }}
+    </div>
   </div>
 </template>
 
@@ -55,29 +60,47 @@ export default {
       userRef: {},
       dbState: {},
       gridColumns: [
-        {title: this.$t('next_title'), field: 'next', sortable: true},
+        {title: this.$t('last_title'), field: 'last', sortable: true, filter: 'toDate'},
+        {title: this.$t('next_title'), field: 'next', sortable: true, filter: 'toUntil'},
         {title: this.$t('often_title'), field: 'often', sortable: true},
         {title: this.$t('name_title'), field: 'name', sortable: true},
         {title: this.$t('shop_title'), field: 'shop', sortable: true},
         {title: this.$t('price_title'), field: 'price', sortable: true}
       ],
-      searchQuery: ''
+      searchQuery: '',
+      modalId: null
     }
   },
   computed: {
     gridData () {
-      return (this.dbState.items) ? this.dbState.items.filter((v) => v.requested).map((v, i) => {
-        return {next: this.$t('now'), often: this.$t('insufficient_data'), name: v.name, shop: v.shop, price: v.price, id: i}
-      }) : []
+      return (this.dbState.items) ? this.dbState.items.map((v, i) => {
+        let last = this.$t('never')
+        if (v.boughtTimes.length > 0) {
+          last = Math.max(...v.boughtTimes.map(o => o.date), 0)
+        }
+        return {
+          last: last,
+          next: this.$t('now'),
+          often: this.$t('insufficient_data'),
+          name: v.name,
+          shop: v.shop,
+          price: v.price,
+          id: i
+        }
+      }).filter((v, i) => this.dbState.items[i].requested) : []
+    },
+    sum () {
+      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + ((v.requested) ? parseFloat(v.price) : 0), 0) : ''
     }
   },
   methods: {
     pop () {
       document.getElementById('amount').focus()
+      document.getElementById('amount').setSelectionRange(0, document.getElementById('amount').value.length)
     },
     bought () {
-      this.dbState.items[this.$modal.id].requested = false
-      this.dbState.items[this.$modal.id].boughtTimes.push({
+      this.dbState.items[this.modalId].requested = false
+      this.dbState.items[this.modalId].boughtTimes.push({
         amount: document.getElementById('amount').value,
         date: Date.now()
       })
@@ -86,7 +109,7 @@ export default {
       this.$modal.hide('bought')
     },
     check (id) {
-      this.$modal.id = id
+      this.modalId = id
       this.$modal.show('bought')
     }
   },
@@ -116,13 +139,13 @@ export default {
 .box {
   margin: auto;
   width: 50%;
-  padding: 5px 20px 10px 20px;
+  padding: 5px 20px 5px 20px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   text-align: left;
   font-size: 120%;
   text-shadow: 1px 1px #444;
   font-family: "Open Sans", sans-serif;
-  overflow: scroll;
+  /* overflow: scroll; */
 }
 .amount-dialog {
   padding: 10px;

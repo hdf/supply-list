@@ -15,7 +15,8 @@
          :columns="gridColumns"
          :filter-key="searchQuery"
          v-show="dbState.items"
-         hiddenClass="editor">
+         hiddenClass="editor"
+         @update="update">
       <template slot-scope="{ item }">
         <div class="hidden_container">
           <span @click="more(item.id)" class="more" :title="$t('more')">&rtrif;</span>
@@ -49,6 +50,12 @@
         </form>
       </div>
     </modal>
+    <br>
+    <div class="box" v-if="dbState.items">
+      <div>{{ $t('weekly') }}:&nbsp;</div><div>{{ weekly }}</div>
+      <div>{{ $t('monthly') }}:&nbsp;</div><div>{{ monthly }}</div>
+      <div>{{ $t('yearly') }}:&nbsp;</div><div>{{ yearly }}</div>
+    </div>
   </div>
 </template>
 
@@ -69,11 +76,12 @@ export default {
       userRef: {},
       dbState: {},
       gridColumns: [
-        {title: this.$t('next_title'), field: 'next', sortable: true},
+        {title: this.$t('last_title'), field: 'last', sortable: true, filter: 'toDate'},
+        {title: this.$t('next_title'), field: 'next', sortable: true, filter: 'toUntil'},
         {title: this.$t('often_title'), field: 'often', sortable: true},
-        {title: this.$t('name_title'), field: 'name', sortable: true},
-        {title: this.$t('shop_title'), field: 'shop', sortable: true},
-        {title: this.$t('price_title'), field: 'price', sortable: true}
+        {title: this.$t('name_title'), field: 'name', sortable: true, editable: true},
+        {title: this.$t('shop_title'), field: 'shop', sortable: true, editable: true},
+        {title: this.$t('price_title'), field: 'price', sortable: true, editable: true}
       ],
       searchQuery: ''
     }
@@ -81,8 +89,30 @@ export default {
   computed: {
     gridData () {
       return (this.dbState.items) ? this.dbState.items.map((v, i) => {
-        return {next: this.$t('now'), often: this.$t('insufficient_data'), name: v.name, shop: v.shop, price: v.price, requested: v.requested, id: i}
+        let last = this.$t('never')
+        if (v.boughtTimes.length > 0) {
+          last = Math.max(...v.boughtTimes.map(o => o.date), 0)
+        }
+        return {
+          last: last,
+          next: this.$t('now'),
+          often: this.$t('insufficient_data'),
+          name: v.name,
+          shop: v.shop,
+          price: v.price,
+          requested: v.requested,
+          id: i
+        }
       }) : []
+    },
+    weekly () {
+      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+    },
+    monthly () {
+      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+    },
+    yearly () {
+      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
     }
   },
   methods: {
@@ -109,32 +139,37 @@ export default {
         }
       })
     },
+    updateDb () {
+      this.dbState.lastChange = Date.now()
+      this.userRef.update(this.dbState)
+    },
     more (id) {
     },
     del (id) {
       this.dbState.items.splice(id, 1)
-      this.dbState.lastChange = Date.now()
-      this.userRef.update(this.dbState)
+      this.updateDb()
     },
     req (id) {
       this.dbState.items[id].requested = true
-      this.dbState.lastChange = Date.now()
-      this.userRef.update(this.dbState)
+      this.updateDb()
     },
     add () {
       this.dbState.items.push({
-        name: document.getElementById('itemName').value,
-        price: document.getElementById('price').value,
-        shop: document.getElementById('shop').value,
+        name: document.getElementById('itemName').value.trim(),
+        price: parseFloat(document.getElementById('price').value.trim()),
+        shop: document.getElementById('shop').value.trim(),
         requested: true,
         boughtTimes: []
       })
-      this.dbState.lastChange = Date.now()
-      this.userRef.update(this.dbState)
+      this.updateDb()
       this.$modal.hide('add')
     },
     pop () {
       document.getElementById('itemName').focus()
+    },
+    update (obj) {
+      this.dbState.items[obj.index][obj.field] = (obj.field === 'price') ? parseFloat(obj.value.trim()) : obj.value.trim()
+      this.userRef.update(this.dbState)
     }
   },
   mounted () {
@@ -177,6 +212,19 @@ hr {
   height: 1px;
   border: none;
   background-color: #333;
+}
+.box {
+  margin: auto;
+  width: 50%;
+  padding: 5px 20px 5px 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  text-align: left;
+  font-size: 120%;
+  text-shadow: 1px 1px #444;
+  font-family: "Open Sans", sans-serif;
+  /* overflow: scroll; */
+  display: inline-grid;
+  grid-template-columns: max-content max-content;
 }
 </style>
 

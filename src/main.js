@@ -5,6 +5,7 @@ import VueFire from 'vuefire'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
+import VueObserveVisibility from 'vue-observe-visibility'
 
 import App from './App'
 import reg from './components/reg'
@@ -14,6 +15,8 @@ import VModal from 'vue-js-modal'
 
 import i18next from 'i18next'
 import VueI18Next from '@panter/vue-i18next'
+
+Vue.use(VueObserveVisibility)
 
 Vue.use(VModal)
 Vue.use(VueI18Next)
@@ -30,6 +33,7 @@ const locales = {
     bought: 'Megvéve',
     bought_amount: 'Vett mennyiség',
     cancel: 'Mégse',
+    last_title: 'Utoljára véve',
     next_title: 'Legközelebb kell',
     often_title: 'Milyen gyakran kell',
     name_title: 'Tárgy',
@@ -37,6 +41,7 @@ const locales = {
     price_title: 'Ár',
     now: 'most',
     insufficient_data: 'nincs elég adat',
+    never: 'soha',
     logout: 'Kijelentkezés',
     add_new: 'Új elem hozzáadása',
     more: 'Több',
@@ -44,7 +49,11 @@ const locales = {
     request: 'Kérés',
     name: 'Név',
     add: 'Hozzáad',
-    lastChanged: 'Utoljára változtatva'
+    lastChanged: 'Utoljára változtatva',
+    total: 'Összesen',
+    weekly: 'Hetente',
+    monthly: 'Havonta',
+    yearly: 'Évente'
   },
   en: {
     title: 'Supply list',
@@ -53,6 +62,7 @@ const locales = {
     bought: 'Bought',
     bought_amount: 'Bought ammount',
     cancel: 'Cancel',
+    last_title: 'Last bought',
     next_title: 'Next needed',
     often_title: 'How often needed',
     name_title: 'Item',
@@ -60,6 +70,7 @@ const locales = {
     price_title: 'Price',
     now: 'now',
     insufficient_data: 'not enough information',
+    never: 'never',
     logout: 'Log out',
     add_new: 'Add new item',
     more: 'More',
@@ -67,12 +78,16 @@ const locales = {
     request: 'Request',
     name: 'Name',
     add: 'Add',
-    lastChanged: 'Last changed'
+    lastChanged: 'Last changed',
+    total: 'Total',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
+    yearly: 'Yearly'
   }
 }
 
 i18next.init({
-  lng: (navigator.language === 'hu') ? 'hu' : 'en',
+  lng: (navigator.language.substr(0, 2) === 'hu') ? 'hu' : 'en',
   fallbackLng: 'en',
   resources: {
     en: { translation: locales.en },

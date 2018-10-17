@@ -13,8 +13,12 @@
     </thead>
     <tbody>
       <tr v-for="(entry, index) in filteredData" :key="index">
-        <td v-for="key in columns" :key="key.field">
-          {{entry[key.field]}}
+        <td v-for="(key, i) in columns" :key="key.field">
+          <div v-if="!(columns[i].editing === index)" @dblclick="$set(columns[i], 'editing', (columns[i].editable) ? index : false)" v-html="customFilter(entry[key.field], key.filter) || '&nbsp;'"></div>
+          <input v-if="columns[i].editing === index" :style="{width: getWidth(i), textAlign: 'center'}" v-model="entry[key.field]"
+            @blur="columns[i].editing = false; $emit('update', {index: entry.id, field: key.field, value: $event.target.value})"
+            @keyup.enter="columns[i].editing = false; $emit('update', {index: entry.id, field: key.field, value: $event.target.value})"
+            v-observe-visibility="visibilityChanged">
         </td>
         <td :class="[{hidden: true}, hiddenClass]">
           <slot :item="entry"></slot>
@@ -71,8 +75,20 @@ export default {
     }
   },
   filters: {
-    capitalize: function (str) {
+    capitalize (str) {
       return str.charAt(0).toUpperCase() + str.slice(1)
+    },
+    toDate (str) {
+      if (typeof str === 'number') {
+        return this.moment(str, 'YYYY.MM.DD. HH:mm') + '<br>(' + this.toUntil(str) + ')'
+      }
+      return str
+    },
+    toUntil (str) {
+      if (typeof str === 'number') {
+        return this.moment(str, 'from', 'now')
+      }
+      return str
     }
   },
   methods: {
@@ -80,6 +96,23 @@ export default {
       this.sortKey = key
       this.sortOrders[key] = this.sortOrders[key] * -1
       this.$router.replace({query: {sort: key, direction: this.sortOrders[key]}})
+    },
+    visibilityChanged (isVisible, entry) {
+      if (isVisible) {
+        entry.target.focus()
+        entry.target.setSelectionRange(0, 0)
+      }
+    },
+    getWidth (i) {
+      return document.querySelectorAll('th')[i].clientWidth - 50 + 'px'
+    },
+    customFilter (str, filter) {
+      if (typeof filter === 'function') {
+        return filter(str)
+      } else if (this.$options.filters[filter]) {
+        return this.$options.filters[filter](str)
+      }
+      return str
     }
   }
 }
