@@ -12,18 +12,23 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(entry, index) in filteredData" :key="index">
-        <td v-for="(key, i) in columns" :key="key.field">
-          <div v-if="!(columns[i].editing === index)" @dblclick="$set(columns[i], 'editing', (columns[i].editable) ? index : false)" v-html="customFilter(entry[key.field], key.filter) || '&nbsp;'"></div>
-          <input v-if="columns[i].editing === index" :style="{width: getWidth(i), textAlign: 'center'}" v-model="entry[key.field]"
-            @blur="columns[i].editing = false; $emit('update', {index: entry.id, field: key.field, value: $event.target.value})"
-            @keyup.enter="columns[i].editing = false; $emit('update', {index: entry.id, field: key.field, value: $event.target.value})"
-            v-observe-visibility="visibilityChanged">
-        </td>
-        <td :class="[{hidden: true}, hiddenClass]">
-          <slot :item="entry"></slot>
-        </td>
-      </tr>
+      <template v-for="(entry, index) in filteredData">
+        <tr :key="index">
+          <td v-for="(key, i) in columns" :key="key.field">
+            <div v-if="!(columns[i].editing === index)" @dblclick="$set(columns[i], 'editing', (columns[i].editable) ? index : false)" v-html="customFilter(entry[key.field], key.filter) || '&nbsp;'"></div>
+            <input v-if="columns[i].editing === index" :style="{width: getWidth(i), textAlign: 'center'}" v-model="entry[key.field]"
+              @blur="columns[i].editing = false; $emit('update', {index: entry.id, field: key.field, value: $event.target.value})"
+              @keyup.enter="columns[i].editing = false; $emit('update', {index: entry.id, field: key.field, value: $event.target.value})"
+              v-observe-visibility="visibilityChanged">
+          </td>
+          <td :class="[{hidden: true}, hiddenClass]">
+            <slot :item="entry"></slot>
+          </td>
+        </tr>
+        <tr :key="'e_' + index" v-if="extra" :class="{extra_hidden: (showExtra !== entry.id), extra: true}">
+          <td :colspan="columns.length" v-html="extra[entry.id]"></td>
+        </tr>
+      </template>
     </tbody>
   </table>
 </template>
@@ -35,6 +40,8 @@ export default {
     data: Array,
     columns: Array,
     filterKey: String,
+    extra: Array,
+    showExtra: Number,
     hiddenClass: ''
   },
   data: function () {
@@ -124,14 +131,12 @@ body {
   font-size: 14px;
   color: #444;
 }
-
 table {
   border: 2px solid #ccc;
   border-radius: 3px;
   background-color: rgba(255,255,255,0.5);
   margin: auto;
 }
-
 th {
   background-color: rgba(238,238,238,0.9);
   color: rgba(0,0,0,0.66);
@@ -141,24 +146,19 @@ th {
   -ms-user-select: none;
   user-select: none;
 }
-
 td {
   background-color: rgba(249,249,249,0.66);
 }
-
 th, td {
   /*min-width: 120px;*/
   padding: 10px 20px;
 }
-
 th.active {
   color: #000;
 }
-
 th.active .arrow {
   opacity: 1;
 }
-
 .arrow {
   display: inline-block;
   vertical-align: middle;
@@ -167,27 +167,22 @@ th.active .arrow {
   margin-left: 5px;
   opacity: 0.66;
 }
-
 .arrow.asc {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-bottom: 4px solid #aaa;
 }
-
 .arrow.dsc {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 4px solid #aaa;
 }
-
 .sortable {
   cursor: pointer;
 }
-
 [class="hidden"] {
   display: none !important;
 }
-
 .hidden {
   display: table-cell;
   padding: 0 6px 0 6px;
@@ -195,8 +190,18 @@ th.active .arrow {
   background-color: rgba(255, 255, 255, 0.66);
   border-radius: 5px;
 }
-
 .hidden:hover {
   background-color: rgba(255, 255, 255, 0.8);
+}
+.extra_hidden {
+  display: none;
+}
+.extra {
+  background-color: rgba(255, 255, 255, 0.44);
+}
+.extra >>> .grid {
+  display: inline-grid;
+  grid-template-columns: max-content max-content;
+  text-align: left;
 }
 </style>

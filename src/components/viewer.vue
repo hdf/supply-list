@@ -10,6 +10,7 @@
     </p>
     <!-- <div class="box" v-show="dbState.items"><pre style="text-align: left;">{{dbState.items}}</pre></div><br> -->
     <br>
+
     <tbl :data="gridData"
          :columns="gridColumns"
          :filter-key="searchQuery"
@@ -19,6 +20,7 @@
         <span @click="check(item.id)" :title="$t('bought')">&check;</span>
       </template>
     </tbl>
+
     <modal name="bought"
            :classes="['v--modal']"
            width="200px"
@@ -28,7 +30,7 @@
       <div class="amount-dialog">
         <p v-if="modalId">{{dbState.items[modalId].name}}</p>
         <form @submit="bought">
-          <label for="amount">{{ $t('bought_amount') }}: &nbsp;</label>
+          <label for="amount">{{ $t('bought_amount') }}:&nbsp;</label>
           <input type="text" id="amount"
                  pattern="[0-9]+"
                  maxlength="3" minlength="1" value="1" size="2" required />
@@ -39,6 +41,7 @@
       </div>
     </modal>
     <br>
+
     <div class="box" v-if="dbState.items">
       {{ $t('total') }}: {{ sum }}
     </div>

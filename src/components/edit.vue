@@ -6,25 +6,29 @@
       <span :title="dbState.lastChange | moment('from', 'now')">
         {{ dbState.lastChange | moment("YYYY.MM.DD. HH:mm:ss") }}
       </span>
-    </p><br>
-    <button @click="logOut" style="padding: 3px 5px 3px 4px;">{{ $t('logout') }}</button><br>
+    </p>
+    <button @click="logOut" class="logOut">{{ $t('logout') }}</button>
     <br>
     <input type="button" @click="$modal.show('add')" class="add_btn" :value="$t('add_new')" />
     <br><br>
+
     <tbl :data="gridData"
          :columns="gridColumns"
          :filter-key="searchQuery"
+         :extra="extra"
+         :showExtra="showExtra"
          v-show="dbState.items"
          hiddenClass="editor"
          @update="update">
       <template slot-scope="{ item }">
         <div class="hidden_container">
-          <span @click="more(item.id)" class="more" :title="$t('more')">&rtrif;</span>
+          <span @click="more(item.id, $event.target)" class="more" :title="$t('more')">&rtrif;</span>
           <span @click="del(item.id)" class="del" :title="$t('delete')">&cross;</span>
           <span @click="req(item.id)" class="req" :title="$t('request')" v-if="!item.requested">&plus;</span>
         </div>
       </template>
     </tbl>
+
     <modal name="add"
            :classes="['v--modal']"
            width="260px"
@@ -33,16 +37,16 @@
            @opened="pop">
       <div class="add-dialog">
         <form @submit="add">
-          <label for="itemName">{{ $t('name') }}: &nbsp;</label>
+          <label for="itemName">{{ $t('name') }}:&nbsp;</label>
           <input type="text" id="itemName"
                  minlength="2" size="20" required />
           <br><br>
-          <label for="price">{{ $t('price_title') }}: &nbsp;</label>
+          <label for="price">{{ $t('price_title') }}:&nbsp;</label>
           <input type="text" id="price"
                  pattern="[0-9]+"
                  minlength="2" size="20" required />
           <br><br>
-          <label for="shop">{{ $t('shop_title') }}: &nbsp;</label>
+          <label for="shop">{{ $t('shop_title') }}:&nbsp;</label>
           <input type="text" id="shop" size="20" />
           <br><hr>
           <input type="submit" class="btn" :value="$t('add')" />
@@ -51,6 +55,7 @@
       </div>
     </modal>
     <br>
+
     <div class="box" v-if="dbState.items">
       <div>{{ $t('weekly') }}:&nbsp;</div><div>{{ weekly }}</div>
       <div>{{ $t('monthly') }}:&nbsp;</div><div>{{ monthly }}</div>
@@ -83,7 +88,9 @@ export default {
         {title: this.$t('shop_title'), field: 'shop', sortable: true, editable: true},
         {title: this.$t('price_title'), field: 'price', sortable: true, editable: true}
       ],
-      searchQuery: ''
+      searchQuery: '',
+      showExtra: -1,
+      prevExtra: false
     }
   },
   computed: {
@@ -106,13 +113,44 @@ export default {
       }) : []
     },
     weekly () {
-      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+      return 'Yet to be implemented'
+      // return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
     },
     monthly () {
-      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+      return 'Yet to be implemented'
+      // return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
     },
     yearly () {
-      return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+      return 'Yet to be implemented'
+      // return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+    },
+    extra () {
+      return this.gridData.map((v) => {
+        let o = {}
+        let html
+        o.totalBought = this.dbState.items[v.id].boughtTimes.reduce((acc, v) => acc + parseInt(v.amount), 0)
+        o.totalCost = v.price * o.totalBought
+        o.yearlyBought = 'Yet to be implemented'
+        html = '<div class="grid">' +
+                 '<div>' + this.$t('totalBought') + ':&nbsp;</div>' +
+                 '<div>' + o.totalBought + '</div>' +
+                 '<div>' + this.$t('totalCost') + ':&nbsp;</div>' +
+                 '<div>' + o.totalCost + '</div>' +
+                 '<div>' + this.$t('yearlyBought') + ':&nbsp;</div>' +
+                 '<div>' + o.yearlyBought + '</div>' +
+                 '<div style="grid-column: 1 / span 2;">&nbsp;</div>' +
+                 '<div style="grid-column: 1 / span 2;">' + this.$t('itCosts') + '</div>' +
+                 '<div style="grid-column: 1 / span 2;"><div class="grid" style="padding-left: 15px;">' +
+                   '<div>' + this.$t('weekly') + ':&nbsp;</div>' +
+                   '<div>Yet to be implemented</div>' +
+                   '<div>' + this.$t('monthly') + ':&nbsp;</div>' +
+                   '<div>Yet to be implemented</div>' +
+                   '<div>' + this.$t('yearly') + ':&nbsp;</div>' +
+                   '<div>Yet to be implemented</div>' +
+                 '</div></div>' +
+               '</div>'
+        return html
+      })
     }
   },
   methods: {
@@ -143,7 +181,19 @@ export default {
       this.dbState.lastChange = Date.now()
       this.userRef.update(this.dbState)
     },
-    more (id) {
+    more (id, e) {
+      if (this.prevExtra) {
+        this.prevExtra.innerHTML = '&rtrif;'
+      }
+      if (this.showExtra !== id) {
+        this.showExtra = id
+        e.innerHTML = '&dtrif;'
+        this.prevExtra = e
+      } else {
+        this.showExtra = -1
+        e.innerHTML = '&rtrif;'
+        this.prevExtra = false
+      }
     },
     del (id) {
       this.dbState.items.splice(id, 1)
@@ -200,6 +250,13 @@ export default {
 }
 .btn:last-child, .add-dialog input[type="text"] {
   float: right;
+}
+.logOut {
+  padding: 3px 5px 3px 4px;
+  margin: 15px 20px 0 0;
+  position: fixed;
+  top: 0;
+  right: 0;
 }
 .add_btn {
   font-family: Arial, Helvetica, sans-serif;

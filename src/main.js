@@ -53,7 +53,11 @@ const locales = {
     total: 'Összesen',
     weekly: 'Hetente',
     monthly: 'Havonta',
-    yearly: 'Évente'
+    yearly: 'Évente',
+    totalBought: 'Eddig véve',
+    totalCost: 'Ez összesen ennyibe került',
+    yearlyBought: 'Évente ennyit veszünk',
+    itCosts: 'Ennyibe kerül'
   },
   en: {
     title: 'Supply list',
@@ -82,7 +86,11 @@ const locales = {
     total: 'Total',
     weekly: 'Weekly',
     monthly: 'Monthly',
-    yearly: 'Yearly'
+    yearly: 'Yearly',
+    totalBought: 'Amount bought so far',
+    totalCost: 'Total cost thus far',
+    yearlyBought: 'Yearly we buy this many',
+    itCosts: 'It costs this much'
   }
 }
 
