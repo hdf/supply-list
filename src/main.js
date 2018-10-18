@@ -73,7 +73,7 @@ const locales = {
     shop_title: 'Shop',
     price_title: 'Price',
     now: 'now',
-    insufficient_data: 'not enough information',
+    insufficient_data: 'not enough data',
     never: 'never',
     logout: 'Log out',
     add_new: 'Add new item',

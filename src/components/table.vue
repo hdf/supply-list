@@ -96,6 +96,12 @@ export default {
         return this.moment(str, 'from', 'now')
       }
       return str
+    },
+    timeDiff (str) {
+      if (typeof str === 'number') {
+        return this.duration(str, 'humanize')
+      }
+      return str
     }
   },
   methods: {

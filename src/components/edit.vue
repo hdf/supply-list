@@ -69,12 +69,14 @@ import { db } from '../main'
 import tbl from './table'
 import firebase from 'firebase/app'
 import 'firebase/auth'
+import mixins from './mixins'
 
 export default {
   name: 'edit',
   components: {
     tbl
   },
+  mixins: [mixins],
   data () {
     return {
       user: {},
@@ -83,7 +85,7 @@ export default {
       gridColumns: [
         {title: this.$t('last_title'), field: 'last', sortable: true, filter: 'toDate'},
         {title: this.$t('next_title'), field: 'next', sortable: true, filter: 'toUntil'},
-        {title: this.$t('often_title'), field: 'often', sortable: true},
+        {title: this.$t('often_title'), field: 'often', sortable: true, filter: 'timeDiff'},
         {title: this.$t('name_title'), field: 'name', sortable: true, editable: true},
         {title: this.$t('shop_title'), field: 'shop', sortable: true, editable: true},
         {title: this.$t('price_title'), field: 'price', sortable: true, editable: true}
@@ -100,10 +102,31 @@ export default {
         if (v.boughtTimes.length > 0) {
           last = Math.max(...v.boughtTimes.map(o => o.date), 0)
         }
+
+        let often = this.$t('insufficient_data')
+        let next = this.$t('now')
+        if (v.boughtTimes.length > 1) {
+          let l = v.boughtTimes.length
+          l = (l > 10) ? 10 : l
+          let boughtTimes = v.boughtTimes.sort((a, b) => {
+            let a2 = a.date
+            let b2 = b.date
+            return (a2 === b2 ? 0 : a2 > b2 ? 1 : -1)
+          }).slice(-l)
+          let dates = boughtTimes.map(o => o.date)
+          dates.unshift(v.created)
+          let naiveDistances = boughtTimes.map((d, i2) => (d.date - dates[i2]) / d.amount)
+          let naiveDistance = naiveDistances.reduce((acc, d) => acc + d, 0) / naiveDistances.length
+          let squareDiffs = naiveDistances.map(d => Math.pow(d - naiveDistance, 2))
+          often = Math.sqrt(squareDiffs.reduce((acc, d) => acc + d, 0) / squareDiffs.length)
+
+          next = last + often
+        }
+
         return {
           last: last,
-          next: this.$t('now'),
-          often: this.$t('insufficient_data'),
+          next: next,
+          often: often,
           name: v.name,
           shop: v.shop,
           price: v.price,
@@ -208,6 +231,7 @@ export default {
         name: document.getElementById('itemName').value.trim(),
         price: parseFloat(document.getElementById('price').value.trim()),
         shop: document.getElementById('shop').value.trim(),
+        created: Date.now(),
         requested: true,
         boughtTimes: []
       })
