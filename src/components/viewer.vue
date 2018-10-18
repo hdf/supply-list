@@ -28,7 +28,7 @@
            :pivotY="0.4"
            @opened="pop">
       <div class="amount-dialog">
-        <p v-if="modalId">{{dbState.items[modalId].name}}</p>
+        <p v-if="modalId !== null">{{dbState.items[modalId].name}}</p>
         <form @submit="bought">
           <label for="amount">{{ $t('bought_amount') }}:&nbsp;</label>
           <input type="text" id="amount"
