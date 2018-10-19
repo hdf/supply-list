@@ -157,6 +157,7 @@ new Vue({
   template: '<app/>',
   created () {
     this.$moment.locale(i18n.i18next.language)
+    // db.enablePersistence()
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.$router.replace('/edit/')
