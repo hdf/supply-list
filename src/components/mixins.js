@@ -18,7 +18,7 @@ export default {
         // l = (l > 10) ? 10 : l
         let boughtTimes = v.boughtTimes.slice().sort(this.sorter).slice(-l)
         let dates = boughtTimes.map(o => o.date)
-        dates.unshift(v.created)
+        dates.unshift(dates[0] - (dates[1] - dates[0]))
         let naiveDistances = boughtTimes.map((d, i2) => (d.date - dates[i2]) / d.amount)
         naiveDistances = naiveDistances.slice().sort(this.sorter).slice(Math.floor(l / 4), Math.floor(l / 4) + Math.ceil(l / 2))
         let naiveDistance = naiveDistances.reduce((acc, d) => acc + d, 0) / naiveDistances.length
