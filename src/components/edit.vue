@@ -113,43 +113,55 @@ export default {
       }) : []
     },
     weekly () {
-      return 'Yet to be implemented'
-      // return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+      return this.extras.reduce((acc, v) => acc + (Number.isInteger(v.weeklyCost) ? v.weeklyCost : 0), 0) || this.$t('insufficient_data')
     },
     monthly () {
-      return 'Yet to be implemented'
-      // return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+      return this.extras.reduce((acc, v) => acc + (Number.isInteger(v.monthlyCost) ? v.monthlyCost : 0), 0) || this.$t('insufficient_data')
     },
     yearly () {
-      return 'Yet to be implemented'
-      // return (this.dbState.items) ? this.dbState.items.reduce((acc, v) => acc + parseFloat(v.price), 0) : ''
+      return this.extras.reduce((acc, v) => acc + (Number.isInteger(v.yearlyCost) ? v.yearlyCost : 0), 0) || this.$t('insufficient_data')
+    },
+    extras () {
+      return this.gridData.map(v => {
+        let o = {}
+        o.totalBought = this.dbState.items[v.id].boughtTimes.reduce((acc, o) => acc + parseInt(o.amount), 0)
+        o.totalCost = v.price * o.totalBought
+        let sortedDates = this.dbState.items[v.id].boughtTimes.slice().sort(this.sorter)
+        o.firstBought = sortedDates[0]
+        o.lastBought = sortedDates[sortedDates.length - 1]
+        o.dateDiff = o.lastBought - o.firstBought
+        o.weeks = o.dateDiff / 604800000
+        o.months = o.dateDiff / 2629743830
+        o.years = o.dateDiff / 31556926000
+        o.weeklyBought = (o.weeks > 0) ? Math.ceil(o.totalBought / o.weeks) : 0
+        o.monthlyBought = (o.months > 0) ? Math.ceil(o.totalBought / o.months) : 0
+        o.yearlyBought = (o.years > 0) ? Math.ceil(o.totalBought / o.years) : this.$t('insufficient_data')
+        o.weeklyCost = (o.weeklyBought > 0) ? v.price * o.weeklyBought : this.$t('insufficient_data')
+        o.monthlyCost = (o.monthlyBought > 0) ? v.price * o.monthlyBought : this.$t('insufficient_data')
+        o.yearlyCost = (o.years > 0 && o.totalBought > 0) ? v.price * Math.ceil(o.totalBought / o.years) : this.$t('insufficient_data')
+        return o
+      })
     },
     extra () {
-      return this.gridData.map((v) => {
-        let o = {}
-        let html
-        o.totalBought = this.dbState.items[v.id].boughtTimes.reduce((acc, v) => acc + parseInt(v.amount), 0)
-        o.totalCost = v.price * o.totalBought
-        o.yearlyBought = 'Yet to be implemented'
-        html = '<div class="grid">' +
+      return this.gridData.map(v => {
+        return '<div class="grid">' +
                  '<div>' + this.$t('totalBought') + ':&nbsp;</div>' +
-                 '<div>' + o.totalBought + '</div>' +
+                 '<div>' + this.extras[v.id].totalBought + '</div>' +
                  '<div>' + this.$t('totalCost') + ':&nbsp;</div>' +
-                 '<div>' + o.totalCost + '</div>' +
+                 '<div>' + this.extras[v.id].totalCost + '</div>' +
                  '<div>' + this.$t('yearlyBought') + ':&nbsp;</div>' +
-                 '<div>' + o.yearlyBought + '</div>' +
+                 '<div>' + this.extras[v.id].yearlyBought + '</div>' +
                  '<div style="grid-column: 1 / span 2;">&nbsp;</div>' +
                  '<div style="grid-column: 1 / span 2;">' + this.$t('itCosts') + '</div>' +
                  '<div style="grid-column: 1 / span 2;"><div class="grid" style="padding-left: 15px;">' +
                    '<div>' + this.$t('weekly') + ':&nbsp;</div>' +
-                   '<div>Yet to be implemented</div>' +
+                   '<div>' + this.extras[v.id].weeklyCost + '</div>' +
                    '<div>' + this.$t('monthly') + ':&nbsp;</div>' +
-                   '<div>Yet to be implemented</div>' +
+                   '<div>' + this.extras[v.id].monthlyCost + '</div>' +
                    '<div>' + this.$t('yearly') + ':&nbsp;</div>' +
-                   '<div>Yet to be implemented</div>' +
+                   '<div>' + this.extras[v.id].yearlyCost + '</div>' +
                  '</div></div>' +
                '</div>'
-        return html
       })
     }
   },
