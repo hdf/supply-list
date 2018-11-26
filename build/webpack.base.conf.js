@@ -3,6 +3,7 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
+const {GenerateSW} = require('workbox-webpack-plugin')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -20,6 +21,11 @@ const createLintingRule = () => ({
 })
 
 module.exports = {
+  plugins: [
+    new GenerateSW({
+      importWorkboxFrom: 'cdn'
+    })
+  ],
   context: path.resolve(__dirname, '../'),
   entry: {
     app: './src/main.js'
