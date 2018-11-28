@@ -174,5 +174,7 @@ if (navigator.serviceWorker.controller) {
     scope: './'
   }).then(function (reg) {
     console.log('Service worker has been registered for scope:' + reg.scope)
+  }).catch(registrationError => {
+    console.log('Service worker registration failed: ', registrationError)
   })
 }

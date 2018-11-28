@@ -4,6 +4,7 @@ const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 const {GenerateSW} = require('workbox-webpack-plugin')
+const cleanPlugin = require('clean-webpack-plugin')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -22,8 +23,23 @@ const createLintingRule = () => ({
 
 module.exports = {
   plugins: [
+    new cleanPlugin(['dist'], {root: path.resolve(__dirname, '../')}),
     new GenerateSW({
-      importWorkboxFrom: 'cdn'
+      //clientsClaim: true,
+      //skipWaiting: true,
+      importWorkboxFrom: 'cdn',
+      runtimeCaching: [{
+        urlPattern: /^((?!\/google\.firestore\.).)*$/ig,
+        handler: 'staleWhileRevalidate',
+        options: {
+          cacheableResponse: {
+            statuses: [0, 200]
+          },
+          fetchOptions: {
+            mode: 'no-cors',
+          }
+        }
+      }]
     })
   ],
   context: path.resolve(__dirname, '../'),
