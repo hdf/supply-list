@@ -29,7 +29,7 @@ module.exports = {
       //skipWaiting: true,
       importWorkboxFrom: 'cdn',
       runtimeCaching: [{
-        urlPattern: /^((?!\/google\.firestore\.).)*$/ig,
+        urlPattern: /^((?!(\/google\.firestore\.|googleapis\.com)).)*$/ig,
         handler: 'staleWhileRevalidate',
         options: {
           cacheableResponse: {

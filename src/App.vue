@@ -3,7 +3,7 @@
     <!--<component :is="component"></component>-->
     <router-view></router-view>
     <br><br>
-    <div class="footer">&copy; 2018 HDF <span style="font-size: 70%;">(Build: 2018.11.26)</span></div>
+    <div class="footer">&copy; 2018 HDF <span style="font-size: 70%;">(Build: 2018.11.29)</span></div>
   </div>
 </template>
 
